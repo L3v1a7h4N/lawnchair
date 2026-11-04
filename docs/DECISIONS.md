@@ -59,8 +59,10 @@ migration.
 
 **Status:** accepted
 
-**Decision.** The cover icon renders `FolderInfo.contents.get(0)`; reordering the folder changes
-the face. A "Set as cover" action moves that item to rank 0.
+**Decision.** The cover icon renders the folder's first preview item; the PR resolves it through
+`FolderCoverMode.getCoverItem()` (`getPreviewItemsOnPage(0).firstOrNull()`), so reordering the
+folder changes the face. Items that cannot stand in for a single app (e.g. app pairs) fall back
+to the normal folder icon.
 
 **Why.** One source of truth. It matches the user's phrasing ("the first app in this folder
 becomes the icon"), survives backup/restore, and avoids stale component names when apps are
