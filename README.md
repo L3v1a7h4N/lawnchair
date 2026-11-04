@@ -1,112 +1,126 @@
-# Lawnchair 16
+# Alcove (working name)
 
-[![Build debug APK](https://github.com/LawnchairLauncher/lawnchair/actions/workflows/ci.yml/badge.svg)](https://github.com/LawnchairLauncher/lawnchair/actions/workflows/ci.yml)
-[![Build release APK](https://github.com/LawnchairLauncher/lawnchair/actions/workflows/release_update.yml/badge.svg)](https://github.com/LawnchairLauncher/lawnchair/actions/workflows/release_update.yml)
-[![Crowdin](https://badges.crowdin.net/e/188ba69d884418987f0b7f1dd55e3a4e/localized.svg)](https://lawnchair.crowdin.com/lawnchair)
-[![OpenCollective](https://img.shields.io/opencollective/all/lawnchair?label=financial%20contributors&logo=open-collective)](https://opencollective.com/lawnchair)
-[![Telegram](https://img.shields.io/endpoint?url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Flccommunity)](https://t.me/lccommunity)
-[![Discord](https://img.shields.io/discord/803299970169700402?label=server&logo=discord)](https://discord.gg/3x8qNWxgGZ)
-[![GitHub Downloads](https://img.shields.io/github/downloads/LawnchairLauncher/lawnchair/total.svg?label=GitHub%20Downloads&logo=github)](https://github.com/LawnchairLauncher/lawnchair/releases)
-[![Play Store Installs](https://img.shields.io/endpoint?color=green&logo=googleplay&logoColor=green&url=https%3A%2F%2Fplay.cuzi.workers.dev%2Fplay%3Fi%3Dapp.lawnchair.play%26l%3DPlay%2520Store%2520Installs%26m%3D%24shortinstalls)](https://play.google.com/store/apps/details?id=app.lawnchair.play)
+A Samsung-first Android 17 home screen whose signature idea is simple: **a folder wears its
+first app as its face. Tap launches that app. Swipe up opens the folder.**
 
-<picture>
-    <!-- Avoid image being clickable with slight workaround -->
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/device-frame-dark.webp" width="250px">
-    <img alt="Smartphone home screen shown in day and night themes, featuring Android Material You dynamic color styling across the wallpaper, clock widget, and app icons." src="docs/assets/device-frame-light.webp" width="250px">
-</picture>
+![Alcove concepts](design/mockups.png)
 
-Lawnchair is a free, open-source home app for Android. Taking Launcher3—Android’s default home app—as a starting point, it ports Pixel Launcher features and introduces rich customization options.
+> Status: **Phase 0 — plan, research, design and a verified upstream build.** No Alcove code has
+> been written yet; this repo holds the decision record, the design system and a working baseline
+> build that has run on both test phones.
 
-This branch houses the codebase of Lawnchair 16, which is currently in development and is based on Launcher3 from Android 16. For Lawnchair 9 to 15, see the branches with the `9-` to `15-` prefixes, respectively.
+## Why this exists
 
-## Features
+The interaction is not new. Nova called it *Swipe to open folder*; Action Launcher called it
+*Covers*. Both apps are effectively discontinued, and the maintained open-source launchers lost
+the feature — Lawnchair's request for it has been open since 2022. It turns a home screen into a
+single page of one-tap apps with every group one swipe away:
 
-- Material 3 Expressive theming that follows your wallpaper and system colors.
-- At a Glance widget support, with integration for [Smartspacer](https://github.com/KieronQuinn/Smartspacer).
-- QuickSwitch support for Android Recents integration on Android 15-16 (root required).
-- Global search for apps, contacts, and web results from the home screen.
-- Customization options for icon packs, fonts, and color settings.
+> **Best case:** open your favourite app with a single tap.
+> **Worst case:** open any other app with a swipe and a tap.
 
-## Download
+Alcove is a bet that this one behaviour, done properly, is worth more than another grid of
+settings.
 
-<p align="left">
-  <a href="https://play.google.com/store/apps/details?id=app.lawnchair.play">
-    <picture>
-      <!-- Avoid image being clickable with slight workaround -->
-      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/badge-google-play.webp" height="60">
-      <img alt="Get it on Google Play" src="docs/assets/badge-google-play.webp" height="60">
-    </picture>
-  </a>
-  <a href="https://apt.izzysoft.de/fdroid/index/apk/app.lawnchair">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/badge-izzyondroid.webp" height="60">
-      <img alt="Get it on IzzyOnDroid" src="docs/assets/badge-izzyondroid.webp" height="60">
-    </picture>
-  </a>
-  <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/LawnchairLauncher/lawnchair/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/badge-obtainium.webp" height="60">
-      <img alt="Get it on Obtainium" src="docs/assets/badge-obtainium.webp" height="60">
-    </picture>
-  </a>
-    <a href="https://github.com/LawnchairLauncher/lawnchair/releases">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/badge-github.webp" height="60">
-      <img alt="Get it on GitHub" src="docs/assets/badge-github.webp" height="60">
-    </picture>
-  </a>
-</p>
+## The plan in one table
 
-Lawnchair on Play Store will install as a different app compared to other sources. Features may be restricted to comply with Google Play’s publishing rules.
+| Phase | Outcome | Status |
+|---|---|---|
+| 0 · Foundation | Base chosen, build verified, devices baselined, name/licence confirmed | Research + build done, owner decisions open |
+| 1 · Brand & shell | Name, icon, tokens, rebranded home layout | Not started |
+| 2 · Covers MVP | Model, icon, tap, swipe, peek, settings, a11y, tests | Not started |
+| 3 · Daily-driver polish | Onboarding, Samsung tuning, performance, privacy, EN/DE | Not started |
+| 4 · Beta & release | Testers, store listing, signed release | Not started |
 
-You can also [verify your installation](https://docs.lawnchair.app/getting-started/install-and-setup/verify) to check if you have installed an official build.
+Full breakdown with exit criteria and risks: **[docs/PLAN.md](docs/PLAN.md)**.
 
-### Development builds
+## Documents
 
-Interested in keeping yourself up-to-date with every Lawnchair development? Try our development builds!
+| Document | What is in it |
+|---|---|
+| [docs/RESEARCH.md](docs/RESEARCH.md) | Fork comparison, licensing, Launcher3 internals, the cover-mode paper trail, API 37 and One UI constraints, build findings |
+| [docs/PLAN.md](docs/PLAN.md) | Phases, work breakdown, definitions of done, test matrix, risks, next actions |
+| [docs/DESIGN.md](docs/DESIGN.md) | Naming, icon concepts, the Covers interaction spec, gesture arbitration, visual language, usability questions |
+| [docs/DECISIONS.md](docs/DECISIONS.md) | ADRs: base, licence, storage, face selection, gesture scope, label, QuickStep, package id, minSdk |
+| [docs/COVERS-SPEC.md](docs/COVERS-SPEC.md) | File-level implementation spec: model, rendering, click routing, gesture, settings, tests |
+| [docs/BUILD.md](docs/BUILD.md) | Exact toolchain, the working build command, host-specific gotchas, install/test commands |
 
-These builds offer the latest features and bug fixes at a cost of performance and additional issues. Make backups before installing.
+## Design
 
-Download: [Obtainium][Obtainium link] • [GitHub][GitHub link] • [nightly.link][Nightly link]
+| UI concepts | Icon concepts |
+|---|---|
+| ![UI](design/mockups.png) | ![Icons](design/icons.png) |
 
-## Sponsors
+The mockups are rendered from HTML: [`design/mockups.html`](design/mockups.html) and
+[`design/icons.html`](design/icons.html).
 
-<p align="left">
-  <a href="https://coderabbit.link/lawnchair">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/sponsor-coderabbit-dark.svg" width="300">
-      <img alt="CodeRabbit" src="docs/assets/sponsor-coderabbit-light.svg" width="300">
-    </picture>
-  </a>
-</p>
+## Base
 
-[CodeRabbit](https://coderabbit.link/lawnchair) is an AI-powered code review platform that integrates directly into pull-request workflows and IDEs, examining code changes in context and suggesting improvements.
+**Lawnchair 16** (`16-dev`), the Android 16-based Launcher3 derivative:
 
-## Support Lawnchair
+- Apache-2.0; `targetSdk 37`, `compileSdk 37.2`, `buildTools 37.0.0`, `minSdk 26`
+- Gradle 9.8.2, AGP 9.5.0, Kotlin 2.4.21, JDK 21 in CI
+- Workspace, folders, widgets, icon packs, search, backup, work profile and private space already
+  implemented
+- Covers is a contained change: `FolderInfo` already persists an `options` bitmask, and
+  `FolderIcon` is a `FrameLayout` with a pluggable click listener
 
-If you love what we do, consider [supporting us on Open Collective](https://opencollective.com/lawnchair)! Your contributions help keep Lawnchair independent and enable us to develop faster.
+AOSP Launcher3 remains the reference implementation and the source of behaviour patches.
+See [ADR-0001](docs/DECISIONS.md).
 
-A huge thank you to our Core Backers ($5+):
-*(These backers directly fund our Project Velocity Fund)*
+![Lawnchair baseline on the S741B](design/device-lawnchair-baseline.png)
 
-[![Core Backers](https://opencollective.com/lawnchair/tiers/backer.svg?avatarHeight=64&width=890&button=false)](https://opencollective.com/lawnchair)
+*The verified upstream build running on the S741B (Android 17). The S741B currently uses Action
+Launcher as its home app — the discontinued launcher that popularised Covers — which is exactly
+the habit this project is designed around.*
 
-[Become a supporter](https://opencollective.com/lawnchair) to help us cover our operational costs, or become a Core Backer to be featured here!
+## Quick start (this machine)
 
-## Contribute
+```powershell
+$env:JAVA_HOME   = "C:\Program Files\Eclipse Adoptium\jdk-25.0.3.9-hotspot"
+$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+$env:GRADLE_USER_HOME = "C:\Users\Robert\developement\launcher\.tools\gradle-home"
 
-Visit the [Lawnchair contributing guidelines](CONTRIBUTING.md) for information and tips on contributing to Lawnchair.
+cd .tools\lawnchair-src
+gradle assembleLawnWithQuickstepGithubDebug
+```
 
-## Quick links
+The APK lands under `.tools\lawnchair-src\build\outputs\apk\`. Verified: **7m 34s, 49 MB debug
+APK, launches on API 36 and 37 without a crash.** This host cannot install SDK platform 37.2, so
+the scratch clone compiles against 37.0; see [docs/BUILD.md](docs/BUILD.md) for that and the JDK
+gotcha.
 
-- [Website](https://lawnchair.app)
-- [Documentation](https://docs.lawnchair.app/)
-- [News on Telegram](https://t.me/lawnchairci)
-- [Discord](https://discord.com/invite/3x8qNWxgGZ)
-- [X (formerly Twitter)](https://x.com/lawnchairapp)
-- [_XDA_ thread](https://xdaforums.com/t/lawnchair-customizable-pixel-launcher.3627137/)
+```powershell
+# install, then launch without changing the default home app
+adb -s RZGL81FQYEN install -r <apk>
+adb -s RZGL81FQYEN shell am start -W -n app.lawnchair.debug/app.lawnchair.LawnchairLauncher
 
-<!-- Download links -->
-[Nightly link]: https://nightly.link/LawnchairLauncher/lawnchair/workflows/ci/16-dev
-[Obtainium link]: https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.lawnchair.nightly%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Flawnchairlauncher%2Flawnchair%22%2C%22author%22%3A%22Lawnchair%20Launcher%22%2C%22name%22%3A%22Lawnchair%20(Debug)%22%2C%22preferredApkIndex%22%3A0%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Afalse%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22Lawnchair%20Nightly%5C%22%2C%5C%22filterReleaseNotesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22verifyLatestTag%5C%22%3Afalse%2C%5C%22dontSortReleasesList%5C%22%3Afalse%2C%5C%22useLatestAssetDateAsReleaseDate%5C%22%3Afalse%2C%5C%22trackOnly%5C%22%3Afalse%2C%5C%22versionExtractionRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22matchGroupToUse%5C%22%3A%5C%22%5C%22%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22releaseDateAsVersion%5C%22%3Atrue%2C%5C%22useVersionCodeAsOSVersion%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22invertAPKFilter%5C%22%3Afalse%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22%5C%22%2C%5C%22shizukuPretendToBeGooglePlay%5C%22%3Afalse%2C%5C%22exemptFromBackgroundUpdates%5C%22%3Afalse%2C%5C%22skipUpdateNotifications%5C%22%3Afalse%2C%5C%22about%5C%22%3A%5C%22Lawnchair%20is%20a%20free%2C%20open-source%20home%20app%20for%20Android.%20(NOTE%3A%20This%20is%20the%20debug%20version%20of%20Lawnchair%2C%20for%20the%20beta%2Fstable%20versions%20see%20%5C%5C%5C%22Lawnchair%5C%5C%5C%22)%5C%22%7D%22%7D
-[GitHub link]: https://github.com/LawnchairLauncher/lawnchair/releases/tag/nightly
+# only if you want it to become the home app
+adb -s RZGL81FQYEN shell cmd package set-home-activity app.lawnchair.debug/app.lawnchair.LawnchairLauncher
+```
+
+The upstream clone in `.tools/` is a scratch build, not our source tree. The product fork still
+has to be created (Phase 0, next actions).
+
+## Test devices
+
+| Device | Model | Android | API | Notes |
+|---|---|---|---|---|
+| Galaxy A54 | SM-A546B | 16 | 36 | Lower bound of the target range |
+| Galaxy S (2026 FE) | SM-S741B | 17 | 37 | Current API level, primary design target |
+
+Both are 1080 × 2340 at 420 dpi effective — 411 × 891 dp.
+
+## Immediate next steps
+
+1. Record the baseline on both phones (cold start, folder open, drawer, widgets, gesture nav);
+   the build is installed and launching already, but not set as the default home app.
+2. Lock the name (Alcove recommended) with Play Store and DPMA/EUIPO checks.
+3. Create the product fork and rebrand the shell.
+4. Build the Covers spike behind a debug flag: `FLAG_COVER`, face icon, tap-to-launch.
+5. Approve or amend the interaction rules in [docs/DESIGN.md](docs/DESIGN.md).
+
+## Licence
+
+Apache-2.0, inherited from AOSP Launcher3 and Lawnchair. Attribution notices are retained; see
+`LICENSE` and `NOTICE` when the fork is created.

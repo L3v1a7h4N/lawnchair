@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Alcove — UI concepts</title>
+<style>
+  :root{
+    --ink:#17130f; --paper:#f7f1e6; --ember:#e2603c; --clay:#c96f4a;
+    --sage:#7c8b74; --sand:#e8dcc8; --muted:rgba(247,241,230,.62);
+    --line:rgba(247,241,230,.16);
+    --r-icon:19px; --r-card:30px;
+  }
+  *{box-sizing:border-box; -webkit-font-smoothing:antialiased;}
+  html,body{margin:0; padding:0; background:#0d0c0b; color:var(--paper);
+    font-family:"Segoe UI Variable Display","Segoe UI",Roboto,Inter,system-ui,sans-serif;}
+  body{padding:56px 48px 72px;}
+  .board-head{display:flex; align-items:flex-end; gap:28px; margin:0 0 44px 4px;}
+  .wordmark{font-size:44px; letter-spacing:-.045em; font-weight:650;}
+  .wordmark em{font-style:normal; color:var(--ember);}
+  .board-head p{margin:0 0 6px; color:rgba(247,241,230,.55); font-size:14px; line-height:1.5; max-width:520px;}
+  .board{display:flex; gap:52px; align-items:flex-start;}
+  figure{margin:0; display:flex; flex-direction:column; gap:18px;}
+  figcaption{font-size:12px; letter-spacing:.13em; text-transform:uppercase; color:rgba(247,241,230,.5);}
+  figcaption b{color:var(--paper); font-weight:600; letter-spacing:.02em; text-transform:none; font-size:13px; margin-right:8px;}
+  .phone{width:412px; height:892px; border-radius:46px; padding:5px;
+    background:linear-gradient(160deg,#3a332c,#141110 40%,#2a241f);
+    box-shadow:0 40px 90px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.10);}
+  .screen{position:relative; width:100%; height:100%; border-radius:41px; overflow:hidden; background:#151210;}
+
+  /* ---------- wallpaper ---------- */
+  .wp{position:absolute; inset:0; background:
+      radial-gradient(120% 80% at 12% 0%, #7d3a2f 0%, transparent 55%),
+      radial-gradient(90% 70% at 92% 8%, #a86a3e 0%, transparent 52%),
+      radial-gradient(120% 90% at 55% 108%, #31463a 0%, transparent 62%),
+      linear-gradient(168deg,#33201a 0%,#1a1512 46%,#0e1411 100%);}
+  .wp:after{content:""; position:absolute; inset:0; opacity:.16;
+    background-image:radial-gradient(rgba(255,255,255,.55) .6px, transparent .7px);
+    background-size:3px 3px;}
+  .blob{position:absolute; border-radius:50%; filter:blur(46px); opacity:.55;}
+  .b1{width:300px;height:300px;left:-110px;top:40px;background:#b45834;}
+  .b2{width:250px;height:250px;right:-90px;top:230px;background:#c99a5e; opacity:.32;}
+  .b3{width:320px;height:280px;left:60px;bottom:-90px;background:#3f5546; opacity:.4;}
+
+  /* ---------- status bar ---------- */
+  .statusbar{position:absolute; top:0; left:0; right:0; height:44px; padding:14px 26px 0;
+    display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:600; letter-spacing:.02em;
+    color:rgba(255,255,255,.92); z-index:9;}
+  .sicons{display:flex; align-items:center; gap:7px;}
+  .sig{display:flex; align-items:flex-end; gap:2px; height:11px;}
+  .sig i{display:block; width:3px; background:currentColor; border-radius:1px;}
+  .sig i:nth-child(1){height:3px}.sig i:nth-child(2){height:5px}.sig i:nth-child(3){height:8px}.sig i:nth-child(4){height:11px}
+  .wifi{width:15px;height:11px; position:relative;}
+  .wifi:before,.wifi:after{content:""; position:absolute; left:50%; transform:translateX(-50%); border-radius:50% 50% 0 0; border:1.6px solid currentColor; border-bottom:0;}
+  .wifi:before{width:15px;height:8px; top:0}
+  .wifi:after{width:8px;height:4px; top:3px}
+  .batt{width:23px;height:11px;border:1.4px solid rgba(255,255,255,.75);border-radius:3.5px;position:relative;padding:1.4px}
+  .batt:after{content:"";position:absolute;right:-3.4px;top:3.2px;width:2px;height:4.4px;background:rgba(255,255,255,.65);border-radius:0 1px 1px 0}
+  .batt i{display:block;height:100%;width:72%;background:var(--paper);border-radius:2px}
+
+  /* ---------- glance ---------- */
+  .glance{position:absolute; top:62px; left:26px; z-index:4;}
+  .glance .date{font-size:12px; letter-spacing:.02em; color:rgba(255,255,255,.72); font-weight:600;}
+  .glance .wx{font-size:15px; font-weight:600; margin-top:3px; color:#fff; display:flex; align-items:center; gap:6px;}
+  .glance .wx svg{opacity:.85}
+
+  /* ---------- grid ---------- */
+  .grid{position:absolute; top:112px; left:20px; right:20px; z-index:4;
+    display:grid; grid-template-columns:repeat(5,1fr); row-gap:24px; column-gap:6px; justify-items:center;}
+  .cell{width:68px; display:flex; flex-direction:column; align-items:center; gap:8px;}
+  .icon-shell{position:relative; width:60px; height:60px; display:grid; place-items:center;}
+  .app-icon{width:60px; height:60px; border-radius:var(--r-icon); position:relative; display:grid; place-items:center;
+    background:linear-gradient(155deg,var(--c1),var(--c2));
+    box-shadow:0 6px 16px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.22);}
+  .app-icon svg{width:30px; height:30px; stroke:#fff; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; opacity:.96;}
+  .label{font-size:11.5px; font-weight:500; color:rgba(255,255,255,.94); text-shadow:0 1px 3px rgba(0,0,0,.45); max-width:68px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
+  /* cover = stacked card behind */
+  .cover .app-icon{ box-shadow:0 8px 18px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.22); }
+  .cover .stack{position:absolute; inset:0; border-radius:var(--r-icon); transform:translateY(-5px) scale(.965);
+    background:linear-gradient(160deg,rgba(255,255,255,.34),rgba(255,255,255,.14));
+    box-shadow:0 2px 10px rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.30);}
+  .cover .stack2{transform:translateY(-9px) scale(.93); opacity:.55; background:rgba(255,255,255,.18);}
+  .cover .count{position:absolute; right:-5px; bottom:-5px; min-width:19px; height:19px; padding:0 5px; border-radius:10px;
+    background:rgba(20,16,13,.86); border:1px solid rgba(255,255,255,.30); color:#fff; font-size:10.5px; font-weight:650;
+    display:grid; place-items:center; backdrop-filter:blur(8px);}
+  .cover .chev{position:absolute; left:50%; bottom:-13px; transform:translateX(-50%); width:16px; height:4px; border-radius:2px;
+    background:rgba(255,255,255,.38);}
+
+  /* normal folder preview */
+  .folder-preview{width:60px;height:60px;border-radius:var(--r-icon); padding:7px; display:grid; grid-template-columns:1fr 1fr; gap:4px;
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.24); backdrop-filter:blur(14px);
+    box-shadow:0 6px 16px rgba(0,0,0,.28);}
+  .folder-preview span{border-radius:7px; display:block;}
+
+  /* ---------- dots / dock / search ---------- */
+  .dots{position:absolute; left:0; right:0; bottom:208px; display:flex; justify-content:center; gap:6px; z-index:5;}
+  .dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.38)}
+  .dots i.on{background:rgba(255,255,255,.95); width:6px;height:6px}
+  .dock{position:absolute; left:20px; right:20px; bottom:118px; height:78px; border-radius:31px; z-index:5;
+    background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.17); backdrop-filter:blur(26px) saturate(1.15);
+    display:flex; align-items:center; justify-content:space-around; padding:0 14px; box-shadow:0 18px 40px rgba(0,0,0,.28);}
+  .dock .app-icon{width:52px;height:52px;border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,.3);}
+  .dock .app-icon svg{width:26px;height:26px}
+  .search{position:absolute; left:22px; right:22px; bottom:44px; height:56px; border-radius:28px; z-index:5;
+    background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.18); backdrop-filter:blur(26px);
+    display:flex; align-items:center; gap:12px; padding:0 20px; color:rgba(255,255,255,.8); font-size:14px; font-weight:500;
+    box-shadow:0 14px 30px rgba(0,0,0,.25);}
+  .search svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2}
+  .search .mic{margin-left:auto}
+  .navbar{position:absolute; left:50%; transform:translateX(-50%); bottom:13px; width:132px; height:4.5px; border-radius:3px; background:rgba(255,255,255,.72); z-index:6;}
+
+  /* ---------- scrim + folder card ---------- */
+  .scrim{position:absolute; inset:0; background:rgba(9,7,6,.56); backdrop-filter:blur(3px); z-index:7;}
+  .folder-card{position:absolute; left:22px; right:22px; top:250px; border-radius:34px; z-index:8;
+    background:linear-gradient(170deg,rgba(52,45,39,.94),rgba(28,24,21,.96));
+    border:1px solid rgba(255,255,255,.14); box-shadow:0 40px 80px rgba(0,0,0,.55); padding:24px 22px 26px;}
+  .folder-head{display:flex; align-items:baseline; gap:10px; margin:0 4px 22px;}
+  .folder-head h3{margin:0; font-size:23px; font-weight:650; letter-spacing:-.02em;}
+  .folder-head span{font-size:13px; color:var(--muted);}
+  .folder-head .edit{margin-left:auto; width:32px;height:32px;border-radius:16px;display:grid;place-items:center;
+    background:rgba(255,255,255,.08); color:rgba(255,255,255,.8); font-size:13px; letter-spacing:.06em;}
+  .folder-grid{display:grid; grid-template-columns:repeat(4,1fr); row-gap:22px; column-gap:8px; justify-items:center;}
+  .folder-grid .app-icon{width:56px;height:56px;border-radius:18px;}
+  .folder-grid .label{font-size:11px; margin-top:7px;}
+  .folder-hint{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:24px; font-size:12px; color:rgba(255,255,255,.5);}
+  .folder-hint kbd{font:inherit; padding:3px 7px; border-radius:7px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.12);}
+
+  /* peek state */
+  .peek-ghost{position:absolute; inset:0; z-index:8; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:0;}
+  .peek-card{width:360px; border-radius:32px 32px 0 0; padding:20px 18px 0; height:392px;
+    background:linear-gradient(180deg,rgba(58,50,44,.97),rgba(30,26,23,.99)); border:1px solid rgba(255,255,255,.14); border-bottom:0;
+    box-shadow:0 -20px 60px rgba(0,0,0,.5);}
+  .peek-card .folder-grid{grid-template-columns:repeat(4,1fr); row-gap:18px;}
+  .peek-card .folder-grid .app-icon{width:50px;height:50px;border-radius:16px}
+  .peek-pill{position:absolute; z-index:9; display:flex; align-items:center; gap:7px; font-size:11px; letter-spacing:.09em;
+    text-transform:uppercase; color:rgba(255,255,255,.86); background:rgba(18,14,12,.62); border:1px solid rgba(255,255,255,.22);
+    padding:7px 11px; border-radius:20px; backdrop-filter:blur(10px);}
+  .peek-line{position:absolute; z-index:8; width:1px; left:130px; top:246px; height:160px;
+    background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0));}
+  .tag{position:absolute; z-index:9; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.7);
+    background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.16); padding:6px 10px; border-radius:20px; backdrop-filter:blur(8px);}
+
+  /* settings */
+  .sheet{position:absolute; inset:0; background:linear-gradient(180deg,#1b1714,#12100e); z-index:3; padding:64px 22px 0;}
+  .sheet h2{font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.45); margin:0 0 8px 6px;}
+  .sheet .big{font-size:31px; font-weight:640; letter-spacing:-.03em; margin:0 0 26px 4px;}
+  .row{display:flex; align-items:center; gap:14px; padding:16px 14px; border-radius:20px; background:rgba(255,255,255,.045); margin-bottom:9px; border:1px solid rgba(255,255,255,.05);}
+  .row .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(226,96,60,.16); color:#f0906f;}
+  .row .ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .row .txt{flex:1; min-width:0}
+  .row .txt b{display:block; font-size:14px; font-weight:560; letter-spacing:-.01em}
+  .row .txt small{display:block; margin-top:3px; font-size:11.5px; color:rgba(255,255,255,.48); line-height:1.35}
+  .sw{width:44px;height:26px;border-radius:13px;background:rgba(255,255,255,.16); position:relative; flex:none; transition:.2s}
+  .sw:after{content:""; position:absolute; top:3px; left:3px; width:20px;height:20px;border-radius:50%; background:#fff; opacity:.7}
+  .sw.on{background:var(--ember)}
+  .sw.on:after{left:21px; opacity:1}
+  .section-label{font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:rgba(255,255,255,.35); margin:26px 0 10px 8px}
+  .seg{display:flex; gap:6px; padding:5px; border-radius:14px; background:rgba(255,255,255,.06); font-size:11.5px; flex:none}
+  .seg span{padding:7px 10px; border-radius:10px; color:rgba(255,255,255,.6)}
+  .seg span.on{background:rgba(255,255,255,.13); color:#fff}
+
+  .legend{margin-top:40px; display:flex; gap:38px; color:rgba(247,241,230,.5); font-size:12px; line-height:1.7; max-width:1860px;}
+  .legend b{color:rgba(247,241,230,.9); font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="board-head">
+  <div class="wordmark">alcove<em>.</em></div>
+  <p>Home screen concept · the folder that behaves like an app.<br>
+     Tap the face app. Swipe up to open the folder. Nothing else moves.</p>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="g-camera"><circle cx="12" cy="12" r="8.4"/><path d="M12 3.6v5.2M20.4 12h-5.2M12 20.4v-5.2M3.6 12h5.2"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/></g>
+    <g id="g-music"><path d="M9 17.5V6.8l9-2v10.7"/><ellipse cx="6.6" cy="18" rx="2.6" ry="2.1"/><ellipse cx="15.6" cy="15.5" rx="2.6" ry="2.1"/></g>
+    <g id="g-maps"><path d="M12 21s6.4-6.1 6.4-10.6A6.4 6.4 0 0 0 5.6 10.4C5.6 14.9 12 21 12 21Z"/><circle cx="12" cy="10.3" r="2.3"/></g>
+    <g id="g-mail"><rect x="3.4" y="5.8" width="17.2" height="12.4" rx="2.6"/><path d="m4.4 7.4 7.6 5.3 7.6-5.3"/></g>
+    <g id="g-chat"><path d="M20.2 11.6c0 4-3.7 7.2-8.2 7.2-1 0-2-.15-2.9-.43L4.4 20l1.3-3.5a6.7 6.7 0 0 1-1.5-4.3c0-4 3.7-7.2 8.2-7.2s7.8 3 7.8 6.6Z"/></g>
+    <g id="g-play"><path d="M8.4 5.6 18.2 12 8.4 18.4V5.6Z"/><path d="M8.4 5.6 13 12l-4.6 6.4"/></g>
+    <g id="g-grid"><rect x="4" y="4.6" width="6.2" height="6.2" rx="1.6"/><rect x="13.8" y="4.6" width="6.2" height="6.2" rx="1.6"/><rect x="4" y="13.4" width="6.2" height="6.2" rx="1.6"/><rect x="13.8" y="13.4" width="6.2" height="6.2" rx="1.6"/></g>
+    <g id="g-note"><path d="M6.6 4.6h8.2l3.6 3.6v11.2H6.6z"/><path d="M14.6 4.8v4h4M9.6 12.3h5M9.6 15.6h5"/></g>
+    <g id="g-bank"><rect x="3.2" y="6.2" width="17.6" height="12" rx="2.8"/><path d="M3.4 10.2h17.2M7 15h3.2"/></g>
+    <g id="g-shop"><path d="M5.4 8.2h13.2l1.1 11.2a1.6 1.6 0 0 1-1.6 1.8H5.9a1.6 1.6 0 0 1-1.6-1.8Z"/><path d="M9 9V7.4a3 3 0 0 1 6 0V9"/></g>
+    <g id="g-game"><path d="M7.6 8.4h8.8a4.2 4.2 0 0 1 4.1 5l-.9 4a2.6 2.6 0 0 1-4.4 1.2l-1.6-1.7h-3.2l-1.6 1.7A2.6 2.6 0 0 1 4.4 17.4l-.9-4a4.2 4.2 0 0 1 4.1-5Z"/><path d="M8 11.4v2.8M6.6 12.8h2.8M15.6 12.2h.01M17.4 13.8h.01"/></g>
+    <g id="g-settings"><circle cx="12" cy="12" r="3.1"/><path d="M19.2 13.6a7.6 7.6 0 0 0 0-3.2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 0 0-2.8-1.6L13.7 2h-3.4l-.4 2.9a7.6 7.6 0 0 0-2.8 1.6l-2.3-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3.2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 0 0 2.8 1.6l.4 2.9h3.4l.4-2.9a7.6 7.6 0 0 0 2.8-1.6l2.3 1 2-3.4Z"/></g>
+    <g id="g-weather"><circle cx="8" cy="9.4" r="3"/><path d="M8 4.4V3M8 15.8v-1.4M3 9.4H1.6M14.4 9.4H13M4.6 6l-1-1M12.4 12.8l-1-1M11.4 6l1-1M4.6 12.8l-1 1"/></g>
+    <g id="g-search"><circle cx="11" cy="11" r="6.3"/><path d="m15.8 15.8 4 4"/></g>
+    <g id="g-mic"><rect x="9.4" y="3.4" width="5.2" height="10" rx="2.6"/><path d="M6.6 11.4a5.4 5.4 0 0 0 10.8 0M12 16.8v3.2"/></g>
+    <g id="g-phone"><path d="M7.4 3.8h2.4l1.3 3.6-1.8 1.4a12 12 0 0 0 5.9 5.9l1.4-1.8 3.6 1.3v2.4a2.4 2.4 0 0 1-2.6 2.4C10.6 18.2 5.8 13.4 5 6.4A2.4 2.4 0 0 1 7.4 3.8Z"/></g>
+    <g id="g-sliders"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></g>
+    <g id="g-hand"><path d="M9 11.5V5.8a1.7 1.7 0 0 1 3.4 0v5.4-6.6a1.7 1.7 0 0 1 3.4 0v6.6-4.8a1.7 1.7 0 0 1 3.4 0v7.4c0 3.4-2.6 6.2-6 6.2h-1.4a5.6 5.6 0 0 1-4.3-2L5 16.2a1.7 1.7 0 0 1 2.3-2.5Z"/></g>
+  </defs>
+</svg>
+
+<main class="board">
+
+  <!-- ============ 01 HOME ============ -->
+  <figure>
+    <div class="phone"><div class="screen">
+      <div class="wp"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+      <div class="statusbar"><span>9:41</span><div class="sicons">
+        <div class="sig"><i></i><i></i><i></i><i></i></div><div class="wifi"></div><div class="batt"><i></i></div>
+      </div></div>
+
+      <div class="glance">
+        <div class="date">MON 2 NOV</div>
+        <div class="wx"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linecap="round"><use href="#g-weather"/></svg> 18° <span style="opacity:.55;font-weight:500">Berlin</span></div>
+      </div>
+
+      <div class="grid">
+        <!-- row 1 -->
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#f1a07a;--c2:#d4563b"><svg viewBox="0 0 24 24"><use href="#g-camera"/></svg></div></div><span class="label">Photos</span></div>
+
+        <div class="cell cover">
+          <div class="icon-shell"><span class="stack2"></span><span class="stack"></span>
+            <div class="app-icon" style="--c1:#8f7bf0;--c2:#5b3ec9"><svg viewBox="0 0 24 24"><use href="#g-play"/></svg></div>
+            <span class="count">6</span>
+          </div><span class="label">Media</span>
+        </div>
+
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#7fc7a8;--c2:#2f8464"><svg viewBox="0 0 24 24"><use href="#g-maps"/></svg></div></div><span class="label">Maps</span></div>
+
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#7aa7f0;--c2:#3a63c4"><svg viewBox="0 0 24 24"><use href="#g-mail"/></svg></div></div><span class="label">Mail</span></div>
+
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#68cfd3;--c2:#228b96"><svg viewBox="0 0 24 24"><use href="#g-chat"/></svg></div></div><span class="label">Chat</span></div>
+
+        <!-- row 2 -->
+        <div class="cell cover">
+          <div class="icon-shell"><span class="stack2"></span><span class="stack"></span>
+            <div class="app-icon" style="--c1:#e8c47c;--c2:#b07b2a"><svg viewBox="0 0 24 24"><use href="#g-bank"/></svg></div>
+          </div><span class="label">Money</span>
+        </div>
+
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#f0b26a;--c2:#c86a22"><svg viewBox="0 0 24 24"><use href="#g-shop"/></svg></div></div><span class="label">Shop</span></div>
+
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#e98a9e;--c2:#b93a5b"><svg viewBox="0 0 24 24"><use href="#g-note"/></svg></div></div><span class="label">Notes</span></div>
+
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#a0a6b8;--c2:#5a6072"><svg viewBox="0 0 24 24"><use href="#g-settings"/></svg></div></div><span class="label">Settings</span></div>
+
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#c9a6e8;--c2:#7a4bb0"><svg viewBox="0 0 24 24"><use href="#g-music"/></svg></div></div><span class="label">Music</span></div>
+
+        <!-- row 3 -->
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#79c0e8;--c2:#2a6f9e"><svg viewBox="0 0 24 24"><use href="#g-grid"/></svg></div></div><span class="label">Files</span></div>
+
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#e6d27a;--c2:#a8871f"><svg viewBox="0 0 24 24"><use href="#g-game"/></svg></div></div><span class="label">Play</span></div>
+
+        <div class="cell cover">
+          <div class="icon-shell"><span class="stack2"></span><span class="stack"></span>
+            <div class="app-icon" style="--c1:#9ecf7a;--c2:#4d8a33"><svg viewBox="0 0 24 24"><use href="#g-chat"/></svg></div>
+            <span class="count">9</span>
+          </div><span class="label">Work</span>
+        </div>
+
+        <div class="cell"><div class="icon-shell"><div class="folder-preview">
+            <span style="background:linear-gradient(150deg,#7aa7f0,#3a63c4)"></span>
+            <span style="background:linear-gradient(150deg,#7fc7a8,#2f8464)"></span>
+            <span style="background:linear-gradient(150deg,#e8c47c,#b07b2a)"></span>
+            <span style="background:linear-gradient(150deg,#a0a6b8,#5a6072)"></span>
+          </div></div><span class="label">Travel</span></div>
+
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#b9b3a6;--c2:#6b655a"><svg viewBox="0 0 24 24"><use href="#g-sliders"/></svg></div></div><span class="label">Tools</span></div>
+
+        <!-- row 4 -->
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#8f7bf0;--c2:#5b3ec9"><svg viewBox="0 0 24 24"><use href="#g-play"/></svg></div></div><span class="label">YouTube</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#e98a9e;--c2:#b93a5b"><svg viewBox="0 0 24 24"><use href="#g-music"/></svg></div></div><span class="label">Spotify</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#a0a6b8;--c2:#4a5060"><svg viewBox="0 0 24 24"><use href="#g-play"/></svg></div></div><span class="label">Netflix</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#79c0e8;--c2:#2a6f9e"><svg viewBox="0 0 24 24"><use href="#g-grid"/></svg></div></div><span class="label">Drive</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#e8c47c;--c2:#b07b2a"><svg viewBox="0 0 24 24"><use href="#g-bank"/></svg></div></div><span class="label">Wallet</span></div>
+
+        <!-- row 5 -->
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#8fd18a;--c2:#3d8b45"><svg viewBox="0 0 24 24"><use href="#g-weather"/></svg></div></div><span class="label">Health</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#68cfd3;--c2:#228b96"><svg viewBox="0 0 24 24"><use href="#g-chat"/></svg></div></div><span class="label">Translate</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#a0a6b8;--c2:#5a6072"><svg viewBox="0 0 24 24"><use href="#g-settings"/></svg></div></div><span class="label">Clock</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#f0b26a;--c2:#c86a22"><svg viewBox="0 0 24 24"><use href="#g-grid"/></svg></div></div><span class="label">Calc</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#f1a07a;--c2:#d4563b"><svg viewBox="0 0 24 24"><use href="#g-camera"/></svg></div></div><span class="label">Camera</span></div>
+      </div>
+
+      <div class="dots"><i class="on"></i><i></i><i></i></div>
+
+      <div class="dock">
+        <div class="app-icon" style="--c1:#8fd18a;--c2:#3d8b45"><svg viewBox="0 0 24 24"><use href="#g-phone"/></svg></div>
+        <div class="app-icon" style="--c1:#68cfd3;--c2:#228b96"><svg viewBox="0 0 24 24"><use href="#g-chat"/></svg></div>
+        <div class="app-icon" style="--c1:#f1a07a;--c2:#d4563b"><svg viewBox="0 0 24 24"><use href="#g-camera"/></svg></div>
+        <div class="app-icon" style="--c1:#a0a6b8;--c2:#5a6072"><svg viewBox="0 0 24 24"><use href="#g-settings"/></svg></div>
+      </div>
+
+      <div class="search"><svg viewBox="0 0 24 24"><use href="#g-search"/></svg><span>Search apps and web</span><svg class="mic" viewBox="0 0 24 24"><use href="#g-mic"/></svg></div>
+      <div class="navbar"></div>
+    </div></div>
+    <figcaption><b>01 · Home</b> Cover icons carry a stacked edge and count.</figcaption>
+  </figure>
+
+  <!-- ============ 02 PEEK ============ -->
+  <figure>
+    <div class="phone"><div class="screen">
+      <div class="wp"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+      <div class="statusbar"><span>9:41</span><div class="sicons">
+        <div class="sig"><i></i><i></i><i></i><i></i></div><div class="wifi"></div><div class="batt"><i></i></div>
+      </div></div>
+
+      <div class="glance">
+        <div class="date">MON 2 NOV</div>
+        <div class="wx"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linecap="round"><use href="#g-weather"/></svg> 18° <span style="opacity:.55;font-weight:500">Berlin</span></div>
+      </div>
+
+      <div class="grid" style="opacity:.35; filter:blur(1px)">
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#f1a07a;--c2:#d4563b"><svg viewBox="0 0 24 24"><use href="#g-camera"/></svg></div></div><span class="label">Photos</span></div>
+        <div class="cell"><div class="icon-shell"><span class="stack"></span><div class="app-icon" style="--c1:#8f7bf0;--c2:#5b3ec9"><svg viewBox="0 0 24 24"><use href="#g-play"/></svg></div></div><span class="label">Media</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#7fc7a8;--c2:#2f8464"><svg viewBox="0 0 24 24"><use href="#g-maps"/></svg></div></div><span class="label">Maps</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#7aa7f0;--c2:#3a63c4"><svg viewBox="0 0 24 24"><use href="#g-mail"/></svg></div></div><span class="label">Mail</span></div>
+        <div class="cell"><div class="icon-shell"><div class="app-icon" style="--c1:#68cfd3;--c2:#228b96"><svg viewBox="0 0 24 24"><use href="#g-chat"/></svg></div></div><span class="label">Chat</span></div>
+      </div>
+
+      <div class="scrim" style="background:linear-gradient(180deg,rgba(9,7,6,.25),rgba(9,7,6,.78))"></div>
+
+      <div class="peek-ghost">
+        <div class="peek-card">
+          <div class="folder-head" style="margin-bottom:18px"><h3 style="font-size:19px">Media</h3><span>6 apps</span></div>
+          <div class="folder-grid">
+            <div class="cell"><div class="app-icon" style="--c1:#8f7bf0;--c2:#5b3ec9"><svg viewBox="0 0 24 24"><use href="#g-play"/></svg></div><span class="label">YouTube</span></div>
+            <div class="cell"><div class="app-icon" style="--c1:#e98a9e;--c2:#b93a5b"><svg viewBox="0 0 24 24"><use href="#g-music"/></svg></div><span class="label">Spotify</span></div>
+            <div class="cell"><div class="app-icon" style="--c1:#f1a07a;--c2:#d4563b"><svg viewBox="0 0 24 24"><use href="#g-camera"/></svg></div><span class="label">Photos</span></div>
+            <div class="cell"><div class="app-icon" style="--c1:#79c0e8;--c2:#2a6f9e"><svg viewBox="0 0 24 24"><use href="#g-grid"/></svg></div><span class="label">Files</span></div>
+            <div class="cell"><div class="app-icon" style="--c1:#c9a6e8;--c2:#7a4bb0"><svg viewBox="0 0 24 24"><use href="#g-music"/></svg></div><span class="label">Podcasts</span></div>
+            <div class="cell"><div class="app-icon" style="--c1:#a0a6b8;--c2:#5a6072"><svg viewBox="0 0 24 24"><use href="#g-play"/></svg></div><span class="label">Netflix</span></div>
+          </div>
+          <div class="folder-hint" style="margin-top:16px">Release to open · slide back to cancel</div>
+        </div>
+      </div>
+
+      <div class="peek-line"></div>
+      <div class="peek-pill" style="left:88px; top:204px">
+        <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 8.4V1.8M1.8 5 5 1.8 8.2 5" stroke="currentColor" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        swipe up
+      </div>
+
+      <div class="dock" style="opacity:.4"><div class="app-icon" style="--c1:#8fd18a;--c2:#3d8b45"><svg viewBox="0 0 24 24"><use href="#g-phone"/></svg></div><div class="app-icon" style="--c1:#68cfd3;--c2:#228b96"><svg viewBox="0 0 24 24"><use href="#g-chat"/></svg></div><div class="app-icon" style="--c1:#f1a07a;--c2:#d4563b"><svg viewBox="0 0 24 24"><use href="#g-camera"/></svg></div><div class="app-icon" style="--c1:#a0a6b8;--c2:#5a6072"><svg viewBox="0 0 24 24"><use href="#g-settings"/></svg></div></div>
+      <div class="navbar"></div>
+    </div></div>
+    <figcaption><b>02 · Peek</b> The folder rises from the icon bounds; release commits.</figcaption>
+  </figure>
+
+  <!-- ============ 03 OPEN ============ -->
+  <figure>
+    <div class="phone"><div class="screen">
+      <div class="wp"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+      <div class="statusbar"><span>9:41</span><div class="sicons">
+        <div class="sig"><i></i><i></i><i></i><i></i></div><div class="wifi"></div><div class="batt"><i></i></div>
+      </div></div>
+
+      <div class="scrim"></div>
+
+      <div class="folder-card">
+        <div class="folder-head"><h3>Media</h3><span>6 apps</span><div class="edit">Edit</div></div>
+        <div class="folder-grid">
+          <div class="cell"><div class="app-icon" style="--c1:#8f7bf0;--c2:#5b3ec9"><svg viewBox="0 0 24 24"><use href="#g-play"/></svg></div><span class="label">YouTube</span></div>
+          <div class="cell"><div class="app-icon" style="--c1:#e98a9e;--c2:#b93a5b"><svg viewBox="0 0 24 24"><use href="#g-music"/></svg></div><span class="label">Spotify</span></div>
+          <div class="cell"><div class="app-icon" style="--c1:#f1a07a;--c2:#d4563b"><svg viewBox="0 0 24 24"><use href="#g-camera"/></svg></div><span class="label">Photos</span></div>
+          <div class="cell"><div class="app-icon" style="--c1:#79c0e8;--c2:#2a6f9e"><svg viewBox="0 0 24 24"><use href="#g-grid"/></svg></div><span class="label">Files</span></div>
+          <div class="cell"><div class="app-icon" style="--c1:#c9a6e8;--c2:#7a4bb0"><svg viewBox="0 0 24 24"><use href="#g-music"/></svg></div><span class="label">Podcasts</span></div>
+          <div class="cell"><div class="app-icon" style="--c1:#a0a6b8;--c2:#5a6072"><svg viewBox="0 0 24 24"><use href="#g-play"/></svg></div><span class="label">Netflix</span></div>
+        </div>
+        <div class="folder-hint"><kbd>tap outside</kbd> or <kbd>swipe down</kbd> to close</div>
+      </div>
+
+      <div class="tag" style="left:50%; top:100px; transform:translateX(-50%)">folder · 6 apps</div>
+      <div class="navbar"></div>
+    </div></div>
+    <figcaption><b>03 · Open</b> A quiet card, no full-screen takeover.</figcaption>
+  </figure>
+
+  <!-- ============ 04 SETTINGS ============ -->
+  <figure>
+    <div class="phone"><div class="screen">
+      <div class="sheet">
+        <div class="statusbar" style="position:absolute"><span>9:41</span><div class="sicons">
+          <div class="sig"><i></i><i></i><i></i><i></i></div><div class="wifi"></div><div class="batt"><i></i></div>
+        </div></div>
+        <h2>Home screen</h2>
+        <div class="big">Covers</div>
+
+        <div class="row"><div class="ic"><svg viewBox="0 0 24 24"><use href="#g-hand"/></svg></div>
+          <div class="txt"><b>Covers</b><small>Tap the face app. Swipe up for the folder.</small></div><div class="sw on"></div></div>
+
+        <div class="row"><div class="ic"><svg viewBox="0 0 24 24"><use href="#g-grid"/></svg></div>
+          <div class="txt"><b>Show app count</b><small>A small badge on each cover.</small></div><div class="sw on"></div></div>
+
+        <div class="row"><div class="ic"><svg viewBox="0 0 24 24"><use href="#g-phone"/></svg></div>
+          <div class="txt"><b>Haptic peek</b><small>A light tick when the folder catches.</small></div><div class="sw on"></div></div>
+
+        <div class="section-label">Gesture</div>
+        <div class="row"><div class="ic"><svg viewBox="0 0 24 24"><use href="#g-sliders"/></svg></div>
+          <div class="txt"><b>Swipe direction</b><small>Up feels like uncovering. Down is one-handed.</small></div>
+          <div class="seg"><span class="on">Up</span><span>Down</span></div></div>
+
+        <div class="section-label">Behaviour</div>
+        <div class="row"><div class="ic"><svg viewBox="0 0 24 24"><use href="#g-note"/></svg></div>
+          <div class="txt"><b>Label</b><small>What to show under a cover icon.</small></div>
+          <div class="seg"><span class="on">App</span><span>Folder</span></div></div>
+
+        <div class="row"><div class="ic"><svg viewBox="0 0 24 24"><use href="#g-play"/></svg></div>
+          <div class="txt"><b>Convert on creation</b><small>New folders with 3+ apps start as covers.</small></div><div class="sw"></div></div>
+      </div>
+      <div class="navbar"></div>
+    </div></div>
+    <figcaption><b>04 · Settings</b> Four controls, no control room.</figcaption>
+  </figure>
+
+</main>
+
+<div class="legend">
+  <div><b>Typography</b><br>System sans, 11–13 sp labels · 23 sp folder title · tabular numerals.</div>
+  <div><b>Shape</b><br>19 dp app icons (60 dp) · 34 dp folder card · 28 dp search · 31 dp dock.</div>
+  <div><b>Color</b><br>Dynamic color from wallpaper; brand ember only in badges, toggles, icon.</div>
+  <div><b>Motion</b><br>Peek: spring 380/0.82, ~320 ms · open: 300 ms · close: 220 ms decelerate.</div>
+</div>
+
+</body>
+</html>
