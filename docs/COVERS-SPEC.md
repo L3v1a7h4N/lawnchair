@@ -1,33 +1,33 @@
-# Covers: implementation spec
+# Covers: implementation notes and enhancement backlog
 
-This is the bridge between [DESIGN.md](DESIGN.md) and the first pull request. It names the
-Launcher3 extension points verified in AOSP `main` and Lawnchair `16-dev`, and keeps the core
-patch small enough to rebase.
+> **Superseded as an implementation plan by [PR #7213](https://github.com/LawnchairLauncher/lawnchair/pull/7213),
+> which is merged into this fork.** The PR already implements the model, rendering, click routing,
+> swipe gesture, long-press toggle, hotseat handling, notification dots and accessibility, under
+> different names than the original sketch below: `FolderInfo.FLAG_COVER_MODE`,
+> `app.lawnchair.folder.FolderCoverMode`, `FolderCoverModeGestureListener`, `FolderLongPress`.
+>
+> Read sections 1–7 as the original design record, not as instructions. The parts still worth
+> building are the product layer: the stacked edge, the count badge, the label policy, the peek
+> preview and the first-run tutorial. Sections 2, 6, 8–10 remain useful for those.
 
-## 1. Data model
+This was the bridge between [DESIGN.md](DESIGN.md) and the first implementation attempt. It names
+the Launcher3 extension points verified in AOSP `main` and Lawnchair `16-dev`.
 
-Add to `com.android.launcher3.model.data.FolderInfo`:
+## 1. Data model (implemented by the PR)
+
+The fork uses `PR #7213`'s API:
 
 ```java
-public static final int FLAG_COVER = 0x00000010;   // next free bit after FLAG_MANUAL_FOLDER_NAME
-
-public boolean isCover() {
-    return hasOption(FLAG_COVER);
-}
-
-@Nullable
-public ItemInfo getCoverItem() {
-    return contents.isEmpty() ? null : contents.get(0);
-}
-
-public void setCover(boolean enabled, ModelWriter writer) {
-    setOption(FLAG_COVER, enabled, writer);
-}
+// FolderInfo
+public static final int FLAG_COVER_MODE = 0x00000010;
 ```
 
-`FolderInfo.onAddToDatabase` already writes `options` to `LauncherSettings.Favorites.OPTIONS`, so
-this persists with **no schema change**. Verify the loader path by round-tripping a folder in a
-unit test and by rebooting a device with a cover folder.
+`FolderCoverMode.isEnabled(info)`, `getCoverItem(folderIcon)` and
+`launchCoverApp(view, folderIcon)` hold the shared logic; the icon owns `toggleCoverMode()` and
+`updateCoverMode()`. Persistence is still the existing `OPTIONS` column, so no schema change.
+
+The original sketch below used `FLAG_COVER` / `getCoverItem()` on `FolderInfo`; the PR reads the
+first *preview* item instead, which also handles app pairs and reordering.
 
 Rules:
 
@@ -98,9 +98,11 @@ If the face is not a `WorkspaceItemInfo` (e.g. a shortcut), fall back to
 `startAppShortcutOrInfoActivity(v, face, launcher)` after making it accessible to the handler, or
 keep the folder open behaviour. Do not duplicate launch logic.
 
-## 4. Gesture
+## 4. Gesture (implemented differently by the PR)
 
-Implement inside `FolderIcon` so the hit area is inherently correct:
+The PR uses Lawnchair's `DirectionalGestureListener` via `FolderCoverModeGestureListener` and
+teaches `Workspace`, `Hotseat` and the two touch controllers to yield to cover icons. The custom
+thresholds below are the *peek enhancement*, not current behaviour.
 
 ```java
 private static final float ARM_DP = 24f;      // start peeking

@@ -75,6 +75,13 @@ The requested behaviour is exactly what the community calls **cover mode**:
 interaction in a maintained launcher. That is a strong positioning story for the store listing
 and for the first-run tutorial.
 
+**Update, 4 November 2026:** the interaction is no longer just a request. [PR #7213 "feat: Add
+folder cover mode"](https://github.com/LawnchairLauncher/lawnchair/pull/7213) implements it in 12
+files and is open against `16-dev`, mergeable, with 11 commits and review fixes already applied
+(hotseat, dots, accessibility, icon refresh). `16-dev` does not contain it yet — I checked
+`FolderInfo.java` on the branch for `FLAG_COVER_MODE`: absent. The fork therefore merges the PR
+instead of writing a second implementation.
+
 ## 4. Is it technically cheap? Yes — this is the important finding
 
 Launcher3 stores folders as rows in `favorites` with `itemType = ITEM_TYPE_FOLDER`. The folder's
@@ -178,33 +185,32 @@ a distinctive launcher can still win.
 
 ## 6. Build feasibility on this machine
 
-Checked in `.tools/lawnchair-src` (shallow clone of `16-dev`, SystemUI submodule included):
+The fork now builds from the repo root (upstream `16-dev` + PR #7213):
 
 - Lawnchair expects **JDK 21**, **Gradle 9.8.2**, **AGP 9.5.0**, build-tools **37.0.0** and
   platform **android-37.2** (`compileSdk { release(37) { minorApiLevel = 2 } }`).
-- This machine has SDK platforms `android-37.0` and `android-36`; `sdkmanager` **fails** to
-  install `platforms;android-37.2` with `Failed to read or create install properties file` even
-  though the SDK root is writable. Workaround for the spike: compile against 37.0
-  (`minorApiLevel = 0`). The real project should install 37.2 (or pin 37.0 deliberately).
+- `sdkmanager` **fails** to install `platforms;android-37.2` with `Failed to read or create
+  install properties file` even though the SDK root is writable. It was installed manually from
+  `platform-37.2_r02.zip` into `platforms\android-37.2`; the previous spike compiled against 37.0
+  as a workaround.
 - The JDK 21 copy in `calendar/.tools/jdk21` starts but **cannot create any file** (even in
   `%TEMP%`), while JDK 25 creates files normally. The build therefore runs with the installed
   Temurin **JDK 25**; Gradle 9.8.2 and AGP 9.5 accept it.
-- Gradle's default home (`C:\Users\Robert\.gradle`) denied the wrapper's lock file to the JVM;
-  using a workspace-local `GRADLE_USER_HOME` and the extracted Gradle 9.8.2 binary works.
+- Gradle's default home (`C:\Users\Robert\.gradle`) denied the wrapper's lock file to the JVM.
+  The scripts set a repo-local `GRADLE_USER_HOME` and use the wrapper successfully.
 
 Exact working command (see `docs/BUILD.md`):
 
 ```powershell
 $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-25.0.3.9-hotspot"
 $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
-$env:GRADLE_USER_HOME = "C:\Users\Robert\developement\launcher\.tools\gradle-home"
-cd .tools\lawnchair-src
-gradle assembleLawnWithQuickstepGithubDebug
+.\scripts\build.ps1 -Install -Device RZGL81FQYEN
 ```
 
-**Result:** `BUILD SUCCESSFUL in 7m 34s` (643 tasks). The APK is 49 MB debug, targets API 37, and
-runs on both phones without a crash: cold start 1.7 s on the S741B (API 37) and 3.0 s on the A54
-(API 36), first run only. Full log, artefact and gotchas: [BUILD.md](BUILD.md).
+**Result:** `BUILD SUCCESSFUL in 6m 20s` (643 tasks). 49 MB debug APK, target API 37. On the S741B
+(API 37): cold start 1.54 s, "Enable cover mode" popup works, tapping the cover launched Google
+Search, swiping up opened the folder (Gmail, YouTube, Drive). The A54 (API 36) has not been re-run
+with the fork. Full log, artefact and gotchas: [BUILD.md](BUILD.md).
 
 ## 7. Open questions for the user
 

@@ -3,6 +3,13 @@
 Status: concept v1, 2 November 2026. Mockups and icon sheets are rendered from
 `design/mockups.html` and `design/icons.html`.
 
+> **Implementation status (4 November 2026).** The core interaction now ships from
+> [PR #7213](https://github.com/LawnchairLauncher/lawnchair/pull/7213): tap launches the face app,
+> swipe up opens the folder, long-press toggles cover mode. The PR shows a plain full-size icon
+> with the folder's label — it does not yet draw the stacked edge, count badge or peek preview.
+> Those, plus the label policy and onboarding, are the design work that remains; this document is
+> their spec. The mockups are the target look, not a screenshot of the current build.
+
 ![Home, peek, open and settings concepts](../design/mockups.png)
 
 ## 1. Naming

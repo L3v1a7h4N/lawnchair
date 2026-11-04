@@ -1,128 +1,120 @@
 # Build and run
 
-Verified on 2 November 2026 with a shallow clone of `LawnchairLauncher/lawnchair@16-dev`
-(commit `f83fbb0`) on Windows 11, then installed on both test phones.
+Verified on 4 November 2026 on Windows 11, from the fork itself: `upstream/16-dev` at
+`85493b9` plus the PR #7213 merge (`9debc69`), built with Android SDK platform 37.2.
 
 ## Result
 
 ```
-BUILD SUCCESSFUL in 7m 34s
-643 actionable tasks: 492 executed, 151 from cache
-APK: .tools/lawnchair-src/build/outputs/apk/lawnWithQuickstepGithub/debug/
-     Lawnchair.16.Dev.(f83fbb0).github.debug.apk   (49 MB, debug)
+BUILD SUCCESSFUL in 6m 20s
+643 actionable tasks: 497 executed, 146 from cache
+APK: build/outputs/apk/lawnWithQuickstepGithub/debug/
+     Lawnchair.16.Dev.(9debc69).github.debug.apk   (49 MB, debug)
 ```
 
-| Device | API | Cold start (debug, first run) | Crash log |
+| Device | API | Test | Result |
 |---|---|---|---|
-| SM-S741B | 37 | 1672 ms | empty |
-| SM-A546B | 36 | 3006 ms | empty |
+| SM-S741B | 37 | Cold start | 1.54 s |
+| SM-S741B | 37 | Long-press folder | "Enable cover mode" popup shown |
+| SM-S741B | 37 | Tap cover icon | Launched `com.google.android.googlequicksearchbox/.SearchActivity` |
+| SM-S741B | 37 | Swipe up on cover | Folder opened; Gmail, YouTube, Drive visible |
 
-Both launches were `am start -W` without changing the default home app. First-run times include
-workspace creation and are not a performance baseline; they only prove the build runs on both
-API levels.
+The A54 (API 36) ran the previous upstream-only build; re-verify it with this fork before beta.
 
 ## Toolchain
 
 | Component | Version | Notes |
 |---|---|---|
-| Gradle | 9.8.2 | wrapper distribution |
-| AGP | 9.5.0 | from `gradle/libs.versions.toml` |
+| Gradle | 9.8.2 | wrapper |
+| AGP | 9.5.0 | `gradle/libs.versions.toml` |
 | Kotlin | 2.4.21 | built-in Kotlin via AGP |
-| JDK | 21 (CI) / 25 (this host) | see gotcha 3 |
-| build-tools | 37.0.0 | SDK |
-| compileSdk | 37.2 upstream, 37.0 in this spike | see gotcha 2 |
-| targetSdk | 37 | |
+| JDK | 21 (CI) / 25 (this host) | see gotcha 1 |
+| build-tools | 37.0.0 | |
+| compileSdk / targetSdk | 37.2 / 37 | |
 | minSdk | 26 | |
-| SDK platform | `android-37.0` installed | `android-37.2` is available but failed to install |
+| SDK platform | `android-37.2` | see gotcha 2 |
 
-## Steps
+## Quick start
 
 ```powershell
-$sdk = "$env:LOCALAPPDATA\Android\Sdk"
-$tools = "C:\Users\Robert\developement\launcher\.tools"
+$env:JAVA_HOME   = "C:\Program Files\Eclipse Adoptium\jdk-25.0.3.9-hotspot"
+$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
 
-# 1. Shallow clone with the SystemUI submodule (required)
-git clone --depth 1 --branch 16-dev --recurse-submodules --shallow-submodules `
-  https://github.com/LawnchairLauncher/lawnchair.git "$tools\lawnchair-src"
-
-# 2. Point Gradle at the SDK
+# one-time: point Gradle at the SDK
 "sdk.dir=C\:\\Users\\Robert\\AppData\\Local\\Android\\Sdk" |
-  Set-Content "$tools\lawnchair-src\local.properties" -Encoding ASCII
+  Set-Content local.properties -Encoding ASCII
 
-# 3. Spike-only: compile against 37.0 instead of 37.2
-#    build.gradle: compileSdk { version = release(37) { minorApiLevel = 0 } }
-
-# 4. Build (workspace-local Gradle home avoids the host lock issue)
-$env:JAVA_HOME        = "C:\Program Files\Eclipse Adoptium\jdk-25.0.3.9-hotspot"
-$env:ANDROID_HOME     = $sdk
-$env:ANDROID_SDK_ROOT = $sdk
-$env:GRADLE_USER_HOME = "$tools\gradle-home"
-
-cd "$tools\lawnchair-src"
-gradle --console=plain assembleLawnWithQuickstepGithubDebug
+# build + install + launch (does not change the default home app)
+.\scripts\build.ps1 -Install -Device RZGL81FQYEN -Launch
 ```
 
-The wrapper (`.\gradlew.bat`) is equivalent once `GRADLE_USER_HOME` is set and a working JDK is
-selected. The extracted Gradle 9.8.2 binary was used here only to bypass a wrapper lock file.
+`scripts/build.ps1` sets `GRADLE_USER_HOME` to `.tools\gradle-home` when it is not already set, so
+caches and the Gradle distribution stay inside the repo. The first run downloads Gradle and
+dependencies; later builds are incremental.
 
-## Install and smoke test
+Plain Gradle equivalent:
 
 ```powershell
-$adb = "$sdk\platform-tools\adb.exe"
-$apk = "$tools\lawnchair-src\build\outputs\apk\lawnWithQuickstepGithub\debug\Lawnchair.16.Dev.(f83fbb0).github.debug.apk"
+.\gradlew.bat assembleLawnWithQuickstepGithubDebug
+```
 
-& $adb -s RZGL81FQYEN install -r $apk      # API 37
-& $adb -s R5CW90LKRDH install -r $apk      # API 36
+## Installing manually
 
-# launch without changing the default home app
+```powershell
+$adb = "$env:ANDROID_HOME\platform-tools\adb.exe"
+$apk = Get-ChildItem build\outputs\apk\lawnWithQuickstepGithub\debug\*.apk |
+       Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+& $adb -s RZGL81FQYEN install -r $apk.FullName
 & $adb -s RZGL81FQYEN shell am start -W -n app.lawnchair.debug/app.lawnchair.LawnchairLauncher
-
-# inspect
-& $adb -s RZGL81FQYEN shell dumpsys activity activities | Select-String topResumedActivity
-& $adb -s RZGL81FQYEN logcat -d -b crash
 
 # return to the user's launcher
 & $adb -s RZGL81FQYEN shell input keyevent KEYCODE_HOME
 ```
 
-Package: `app.lawnchair.debug` (the `github` flavour adds `.debug`). Launcher activity:
-`app.lawnchair.LawnchairLauncher`.
-
-To actually make it the home app:
+Package `app.lawnchair.debug`; launcher activity `app.lawnchair.LawnchairLauncher`. To make it the
+home app (only with the owner's agreement):
 
 ```powershell
 & $adb -s <serial> shell cmd package set-home-activity app.lawnchair.debug/app.lawnchair.LawnchairLauncher
 ```
 
-Do this only with the owner's agreement; the S741B currently runs Action Launcher as its home app.
+## Testing cover mode by hand
 
-## Host gotchas (all reproducible)
+1. Long-press a folder with at least two apps.
+2. Choose **Enable cover mode**. The icon becomes the folder's first app.
+3. Tap the icon → that app launches.
+4. Swipe up on the icon → the folder opens.
+5. Long-press again → **Disable cover mode** restores the grid icon.
 
-1. **Wrapper lock denied.** `gradlew.bat` failed with `FileNotFoundException ...gradle-9.8.2-bin.zip.lck
-   (Zugriff verweigert)` when using `C:\Users\Robert\.gradle`. Setting `GRADLE_USER_HOME` to a
-   workspace directory and invoking the extracted Gradle binary fixed it. A fresh
-   `GRADLE_USER_HOME` also failed to create its own parent directories from Java, so the
-   directory must exist before the build.
-2. **`platforms;android-37.2` will not install.** `sdkmanager` (cmdline-tools latest, JDK 21)
-   downloads and then fails with `Failed to read or create install properties file`, even though
-   the SDK root is writable. The spike compiles against `android-37.0`. Options for the product
-   build: retry with a fresh cmdline-tools, install the platform manually from the repository
-   XML, or pin `compileSdk 37.0` deliberately.
-3. **JDK 21 in `calendar/.tools/jdk21` cannot write files.** Java 21 starts but every
-   `File.createNewFile()` fails with `Access denied`, including in `%TEMP%`, while JDK 25 and
-   Node/cmd write normally. The build uses JDK 25. This is a host anomaly, not a project
-   requirement; CI should still use a clean JDK 21.
-4. **First build downloads a lot.** Expect ~7–10 minutes and several GB in `GRADLE_USER_HOME`
-   on a warm network. Subsequent builds are incremental.
+`uiautomator dump` is useful for automation: the popup item has text `Enable cover mode`, and the
+open folder exposes `folder_content` with each app's label.
+
+## Host gotchas
+
+1. **The JDK 21 in `calendar/.tools/jdk21` cannot write files.** Java 21 starts, but every
+   `File.createNewFile()` fails with `Access denied`, even in `%TEMP%`; JDK 25 and Node/cmd write
+   normally. The build uses JDK 25. CI should use a clean JDK 21.
+2. **`sdkmanager` cannot install `platforms;android-37.2` into the expected path.** It downloads,
+   then fails with `Failed to read or create install properties file`. If the directory already
+   exists it installs to `android-37.2-2` and warns about an inconsistent location. The reliable
+   fix is manual:
+
+   ```powershell
+   $zip = "$env:TEMP\android-37.2.zip"
+   Invoke-WebRequest "https://dl.google.com/android/repository/platform-37.2_r02.zip" -OutFile $zip
+   Expand-Archive $zip "$env:LOCALAPPDATA\Android\Sdk\platforms" -Force
+   ```
+
+   SHA-1: `d52b3062af96f7c4dfdca5a479cd1db33ae83762`.
+3. **Gradle wrapper lock with the default home.** `C:\Users\Robert\.gradle` denied the wrapper's
+   `.lck` file when the build ran under the broken JDK 21. Using JDK 25 and a repo-local
+   `GRADLE_USER_HOME` avoids it; the scripts do this by default.
+4. **First build is long.** ~6–10 minutes and a few GB in `.tools\gradle-home` on a warm network.
 
 ## What this proves
 
-- The Lawnchair 16 source builds unmodified (except the compileSdk minor) on this host.
-- The resulting APK targets API 37, runs on Android 16 and 17 Samsung hardware, and does not
-  crash on launch.
-- The Covers work can start from a known-good baseline rather than a build investigation.
-
-## Next build milestone
-
-Create the product fork, rename `applicationId` and the launcher label, then add
-`FLAG_COVER` behind a debug flag and produce the first APK that opens a cover folder.
+- The PR applies cleanly to current `16-dev` (auto-merge, no manual conflict).
+- The combined tree compiles and targets API 37.
+- The feature works on Samsung hardware: popup toggle, tap launch, swipe open.
+- The sync/rollback path is ready; the missing piece is automated instrumentation.
