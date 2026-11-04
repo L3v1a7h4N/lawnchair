@@ -46,6 +46,8 @@ What it does:
    build is kept as an `alcove-failed-*` branch; a conflicted merge is aborted.
 
 Details, conflict handling and the "PR got merged upstream" path: [docs/UPSTREAM.md](docs/UPSTREAM.md).
+When Lawnchair opens `17-dev`, pass `-UpstreamBranch 17-dev`; the cover detection and PR logic are
+branch-agnostic.
 
 ## Build
 

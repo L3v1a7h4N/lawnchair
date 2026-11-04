@@ -52,7 +52,8 @@ recognise).
 ## What "newest working" means
 
 - **Newest:** `upstream/16-dev` at the time the script runs. It does not track `main`, tags or
-  release branches on purpose — `16-dev` is where Lawnchair 16 development happens.
+  release branches on purpose — `16-dev` is where Lawnchair 16 development happens. When
+  Lawnchair opens `17-dev`, run with `-UpstreamBranch 17-dev`; everything else stays the same.
 - **Working:** the debug variant assembles and the APK installs/launches. The script does not run
   the instrumented suite yet; that is a follow-up (`scripts/test.ps1`) before the fork is used as
   a daily driver.

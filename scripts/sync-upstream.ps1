@@ -34,6 +34,9 @@
 .PARAMETER Pr
     Pull request number to track. Defaults to 7213.
 
+.PARAMETER UpstreamBranch
+    Lawnchair development branch. Defaults to 16-dev; use 17-dev when it exists.
+
 .PARAMETER BuildTask
     Gradle task. Defaults to assembleLawnWithQuickstepGithubDebug.
 
@@ -48,6 +51,7 @@ param(
     [switch]$NoBuild,
     [switch]$NoPr,
     [int]$Pr = 7213,
+    [string]$UpstreamBranch = "16-dev",
     [string]$BuildTask = "assembleLawnWithQuickstepGithubDebug"
 )
 
@@ -58,7 +62,7 @@ $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
 $upstreamUrl = "https://github.com/LawnchairLauncher/lawnchair.git"
-$upstreamRef = "upstream/16-dev"
+$upstreamRef = "upstream/$UpstreamBranch"
 $prRef = "pr/$Pr"
 $logDir = Join-Path $root ".tools\logs"
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -119,7 +123,7 @@ if ($remotes -notcontains "upstream") {
 }
 
 Write-Host "fetching $upstreamRef ..."
-Invoke-Git @("fetch", "--no-tags", "upstream", "16-dev")
+Invoke-Git @("fetch", "--no-tags", "upstream", $UpstreamBranch)
 
 $startCommit = (& git rev-parse HEAD).Trim()
 $upstreamCommit = (& git rev-parse $upstreamRef).Trim()
