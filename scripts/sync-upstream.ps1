@@ -225,9 +225,12 @@ try {
     Write-Warning $_.Exception.Message
 
     $failedBranch = "alcove-failed-$stamp"
-    & git branch -f $failedBranch HEAD 2>$null
-    if ($LASTEXITCODE -eq 0) {
-        Write-Warning "failed state kept as branch $failedBranch"
+    $headNow = (& git rev-parse HEAD).Trim()
+    if ($headNow -ne $startCommit) {
+        & git branch -f $failedBranch HEAD 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Warning "failed build kept as branch $failedBranch"
+        }
     }
 
     if (Test-Path (Join-Path $root ".git\MERGE_HEAD")) {

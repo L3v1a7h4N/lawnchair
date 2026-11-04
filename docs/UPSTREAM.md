@@ -40,9 +40,10 @@ later without rewriting anything.
 6. **Build.** `assembleLawnWithQuickstepGithubDebug` with the repo-local
    `GRADLE_USER_HOME` and the wrapper.
 7. **Success.** Tag `alcove-last-good`, print the APK, optionally `adb install -r` and launch.
-8. **Failure.** Keep the attempted state as `alcove-failed-<timestamp>`, `git merge --abort` if a
-   merge is in progress, `git reset --hard` to the starting commit. The previous good version is
-   never left half-updated.
+8. **Failure.** If a merge completed but the build failed, keep that commit as
+   `alcove-failed-<timestamp>` for inspection. If a merge conflicted, abort it. Either way,
+   `git reset --hard` back to the starting commit, so the previous good version is never left
+   half-updated.
 
 `-NoBuild` stops after the merge (useful to inspect a conflict-free update before committing to a
 build). `-NoPr` ignores the PR (useful if upstream has an implementation the detector does not

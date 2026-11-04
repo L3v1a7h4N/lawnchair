@@ -42,8 +42,8 @@ What it does:
    merges PR #7213; if yes, skips it automatically.
 4. Builds `assembleLawnWithQuickstepGithubDebug`.
 5. On success: tags `alcove-last-good`, optionally installs.
-6. On failure: rolls `main` back to the commit it started from and keeps the failed merge as an
-   `alcove-failed-*` branch.
+6. On failure: rolls `main` back to the commit it started from. A completed merge that fails to
+   build is kept as an `alcove-failed-*` branch; a conflicted merge is aborted.
 
 Details, conflict handling and the "PR got merged upstream" path: [docs/UPSTREAM.md](docs/UPSTREAM.md).
 
