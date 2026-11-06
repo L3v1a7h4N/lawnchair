@@ -22,6 +22,9 @@
 .PARAMETER Launch
     After installing, start the launcher activity (does not change the default home app).
 
+.PARAMETER Push
+    Push the updated main branch and the alcove-* tags to origin after a successful build.
+
 .PARAMETER Device
     adb serial. Required when more than one device is connected.
 
@@ -47,6 +50,7 @@
 param(
     [switch]$Install,
     [switch]$Launch,
+    [switch]$Push,
     [string]$Device = "",
     [switch]$NoBuild,
     [switch]$NoPr,
@@ -135,6 +139,8 @@ $prCommit = $null
 Write-Host "upstream: $($upstreamCommit.Substring(0, 10))"
 Write-Host "cover mode already upstream: $coverInUpstream"
 
+$buildSucceeded = $false
+
 try {
     & git merge-base --is-ancestor $upstreamRef HEAD
     if ($LASTEXITCODE -ne 0) {
@@ -195,11 +201,26 @@ try {
 
     Invoke-Git @("tag", "-f", "alcove-last-good", "HEAD")
     Invoke-Git @("tag", "-f", "alcove-good-$stamp", "HEAD")
+    $buildSucceeded = $true
+
+    if ($Push) {
+        if (@(& git remote) -notcontains "origin") {
+            throw "No origin remote. Add it with: git remote add origin <url>"
+        }
+        Write-Host "pushing $branch and tags to origin ..." -ForegroundColor Cyan
+        & git push origin $branch
+        if ($LASTEXITCODE -ne 0) { throw "git push $branch failed" }
+        & git push -f origin "refs/tags/alcove-last-good"
+        if ($LASTEXITCODE -ne 0) { throw "pushing alcove-last-good failed" }
+        & git push origin "refs/tags/alcove-good-$stamp"
+        if ($LASTEXITCODE -ne 0) { throw "pushing alcove-good-$stamp failed" }
+    }
 
     Write-Host ""
     Write-Host "OK — $branch is on $((& git rev-parse --short HEAD).Trim())" -ForegroundColor Green
     Write-Host "  upstream merged: $mergedUpstream"
     Write-Host "  PR #$Pr merged:  $mergedPr"
+    Write-Host "  pushed:          $Push"
     if ($apk) { Write-Host "  APK: $($apk.FullName) ($([math]::Round($apk.Length / 1MB, 1)) MB)" }
     Write-Host "  build log: $buildLog"
 
@@ -227,6 +248,11 @@ try {
     }
 } catch {
     Write-Warning $_.Exception.Message
+
+    if ($buildSucceeded) {
+        Write-Warning "The build succeeded and is tagged alcove-last-good; not rolling back."
+        exit 1
+    }
 
     $failedBranch = "alcove-failed-$stamp"
     $headNow = (& git rev-parse HEAD).Trim()

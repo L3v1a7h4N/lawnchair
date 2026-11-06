@@ -32,8 +32,8 @@ Tap launched Google Search; swipe up opened the folder with Gmail, YouTube and D
 current and only keeps the result if it builds:
 
 ```powershell
-# fetch newest 16-dev, merge PR #7213 if cover mode is still missing, build, install
-.\scripts\sync-upstream.ps1 -Install -Device RZGL81FQYEN
+# fetch newest 16-dev, merge PR #7213 if cover mode is still missing, build, publish, install
+.\scripts\sync-upstream.ps1 -Push -Install -Device RZGL81FQYEN
 ```
 
 What it does:

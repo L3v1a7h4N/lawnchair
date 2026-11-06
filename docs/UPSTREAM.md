@@ -22,7 +22,7 @@ later without rewriting anything.
 ## The sync loop
 
 ```powershell
-.\scripts\sync-upstream.ps1 -Install -Device RZGL81FQYEN
+.\scripts\sync-upstream.ps1 -Push -Install -Device RZGL81FQYEN
 ```
 
 1. **Clean check.** Refuses to run with a dirty working tree; `local.properties`, `.tools/` and
@@ -39,11 +39,12 @@ later without rewriting anything.
    only the new commits are merged.
 6. **Build.** `assembleLawnWithQuickstepGithubDebug` with the repo-local
    `GRADLE_USER_HOME` and the wrapper.
-7. **Success.** Tag `alcove-last-good`, print the APK, optionally `adb install -r` and launch.
+7. **Success.** Tag `alcove-last-good` and `alcove-good-<timestamp>`, print the APK. With
+   `-Push`, push `main` and both tags to `origin`; with `-Install`, `adb install -r` and launch.
 8. **Failure.** If a merge completed but the build failed, keep that commit as
    `alcove-failed-<timestamp>` for inspection. If a merge conflicted, abort it. Either way,
    `git reset --hard` back to the starting commit, so the previous good version is never left
-   half-updated.
+   half-updated. A failure after a successful build (push/install) never rolls the build back.
 
 `-NoBuild` stops after the merge (useful to inspect a conflict-free update before committing to a
 build). `-NoPr` ignores the PR (useful if upstream has an implementation the detector does not
