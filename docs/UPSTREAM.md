@@ -101,11 +101,27 @@ git switch alcove-failed-<timestamp>
   `https://dl.google.com/android/repository/platform-37.2_r02.zip` unpacked into
   `%LOCALAPPDATA%\Android\Sdk\platforms\android-37.2` (see [BUILD.md](BUILD.md)).
 
-## Adding a remote
+## Remotes and publishing
+
+The fork lives at <https://github.com/L3v1a7h4N/lawnchair>:
 
 ```powershell
-git remote add origin git@github.com:<account>/<repo>.git
-git push -u origin main
+origin    https://github.com/L3v1a7h4N/lawnchair.git
+upstream  https://github.com/LawnchairLauncher/lawnchair.git
 ```
 
-Do not push `pr/7213` or `alcove-failed-*`; they are local working refs.
+`main` tracks `origin/main`. Push normal changes with:
+
+```powershell
+git push
+```
+
+The first push also published the `alcove-*` tags. Do not push `pr/7213` or `alcove-failed-*`;
+they are local working refs.
+
+**Default branch:** the GitHub fork was created with upstream's `16-dev` as its default. Set it to
+`main` once, in *Settings → General → Default branch*, so the repository page shows Alcove rather
+than upstream's branch. This is a server-side setting; `git push` cannot change it.
+
+The fork still shows "forked from LawnchairLauncher/lawnchair", which is accurate: `main` contains
+upstream history, the Alcove docs and the PR #7213 merge.

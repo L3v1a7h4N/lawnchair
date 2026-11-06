@@ -2,6 +2,8 @@
 
 A downstream fork of **Lawnchair 16** (`16-dev`) that always tracks the newest working upstream,
 and carries **folder cover mode** until Lawnchair ships it itself.
+Fork: <https://github.com/L3v1a7h4N/lawnchair> · upstream:
+<https://github.com/LawnchairLauncher/lawnchair>.
 
 Cover mode is the interaction this project is about: a folder shows its first app as its icon,
 tapping launches that app, swiping up opens the folder. It is implemented by
